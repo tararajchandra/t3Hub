@@ -35,17 +35,21 @@ mod tests {
         assert_eq!(index.repository_id, "t3-official");
         assert!(index.packages.len() >= 4, "Should have at least 4 test packages");
 
-        // 3. Test manifest fetch and validation
-        let devstudio_pkg = index.packages.iter()
-            .find(|p| p.id == "developer.devstudio")
-            .expect("developer.devstudio should exist in index");
-        let manifest = client.fetch_manifest(base_url, &devstudio_pkg.manifest_path).await
-            .expect("Failed to fetch and parse manifest");
+        // 3. Test manifest fetch and validation across all index packages
+        for pkg in &index.packages {
+            let manifest = client.fetch_manifest(base_url, &pkg.manifest_path).await
+                .unwrap_or_else(|e| panic!("Failed to fetch and parse manifest for {}: {}", pkg.id, e));
 
-        assert_eq!(manifest.package.id, devstudio_pkg.id);
-        assert_eq!(manifest.schema_version, "1.0");
-        assert_eq!(manifest.platform.os, "windows");
-        assert_eq!(manifest.installation.artifact, "windows-x64-installer");
+            assert_eq!(manifest.package.id, pkg.id);
+            assert_eq!(manifest.schema_version, "1.0");
+            assert_eq!(manifest.platform.os, "windows");
+            assert!(
+                manifest.artifacts.iter().any(|a| a.id == manifest.installation.artifact),
+                "Installation artifact '{}' must exist in artifacts for package '{}'",
+                manifest.installation.artifact,
+                pkg.id
+            );
+        }
     }
 
     #[tokio::test]
