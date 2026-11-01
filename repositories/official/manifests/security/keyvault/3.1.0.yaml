@@ -1,0 +1,54 @@
+schema_version: "1.0"
+
+package:
+  id: "security.keyvault"
+  name: "KeyVault Desktop"
+  version: "3.1.0"
+  description: "Zero-knowledge offline credentials vault with hardware security key (FIDO2) support."
+  publisher: "CipherSecurity"
+  license: "MIT"
+  homepage: "https://keyvault.security"
+  repository: "https://github.com/ciphersecurity/keyvault"
+  categories:
+    - Security
+    - Utilities
+  tags:
+    - password-manager
+    - vault
+    - security
+    - fido2
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+    - "arm64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-10-15"
+
+artifacts:
+  - id: "windows-x64-setup"
+    type: "exe"
+    url: "https://github.com/ciphersecurity/keyvault/releases/download/v3.1.0/KeyVault-Setup-3.1.0.exe"
+    sha256: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    size: 19800500
+
+installation:
+  type: "exe"
+  artifact: "windows-x64-setup"
+  scope: "user"
+  arguments:
+    - "/S"
+  timeout_seconds: 600
+
+uninstallation:
+  type: "registry"
+  detect:
+    registry_path: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\KeyVault"
+
+updates:
+  strategy: "version"
+  channel: "stable"

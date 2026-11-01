@@ -1,0 +1,11 @@
+{
+  "id": "t3-official",
+  "name": "T3 Official Repository",
+  "url": "https://repo.t3hub.dev/official/",
+  "type": "official",
+  "version": 1,
+  "description": "Curated, verified open-source and commercial applications for Windows",
+  "public_key": "4c9d92e59df1890f5c88b48bb11c1d9f0ad7de3f1390f7de3e660e428cf084d5",
+  "trust_policy": "verified",
+  "updated_at": "2026-10-31T12:00:00Z"
+}

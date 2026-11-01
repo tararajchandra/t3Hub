@@ -1,0 +1,53 @@
+schema_version: "1.0"
+
+package:
+  id: "tools.terminal-x"
+  name: "Terminal-X"
+  version: "2.0.1"
+  description: "GPU-accelerated modern terminal emulator for Windows with native split panes and tabs."
+  publisher: "Terminal Lab"
+  license: "Apache-2.0"
+  homepage: "https://terminalx.org"
+  repository: "https://github.com/terminallab/terminalx"
+  categories:
+    - Developer Tools
+    - Utilities
+  tags:
+    - terminal
+    - cli
+    - developer-tools
+    - powershell
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+    - "arm64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-10-25"
+
+artifacts:
+  - id: "windows-x64-portable"
+    type: "zip"
+    url: "https://github.com/terminallab/terminalx/releases/download/v2.0.1/terminalx-v2.0.1-win-x64.zip"
+    sha256: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    size: 15480200
+
+installation:
+  type: "zip"
+  artifact: "windows-x64-portable"
+  scope: "user"
+  arguments: []
+  timeout_seconds: 300
+
+uninstallation:
+  type: "zip_directory"
+  detect:
+    directory_path: "%LOCALAPPDATA%\\T3Hub\\Apps\\tools.terminal-x"
+
+updates:
+  strategy: "version"
+  channel: "stable"

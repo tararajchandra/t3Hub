@@ -1,0 +1,45 @@
+# Rust build artifacts
+target/
+**/target/
+**/*.rs.bk
+Cargo.lock
+
+# Node.js
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tauri
+**/src-tauri/target/
+**/gen/
+
+# SQLite databases & temp files
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Private Keys & Secrets
+*.key
+*.pem
+*keys.json
+*.secret
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+.DS_Store

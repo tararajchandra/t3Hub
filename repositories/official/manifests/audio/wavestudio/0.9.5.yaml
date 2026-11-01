@@ -1,0 +1,54 @@
+schema_version: "1.0"
+
+package:
+  id: "audio.wavestudio"
+  name: "WaveStudio"
+  version: "0.9.5"
+  description: "Professional multi-track digital audio workstation and audio editing suite."
+  publisher: "Acoustic Audio"
+  license: "GPL-3.0"
+  homepage: "https://wavestudio.sound"
+  repository: "https://github.com/acousticaudio/wavestudio"
+  categories:
+    - Audio
+    - Media
+  tags:
+    - audio-editor
+    - daw
+    - music
+    - sound
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-10-20"
+
+artifacts:
+  - id: "windows-x64-msi"
+    type: "msi"
+    url: "https://github.com/acousticaudio/wavestudio/releases/download/v0.9.5/WaveStudio-0.9.5.msi"
+    sha256: "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+    size: 42100800
+
+installation:
+  type: "msi"
+  artifact: "windows-x64-msi"
+  scope: "user"
+  arguments:
+    - "/qn"
+    - "/norestart"
+  timeout_seconds: 900
+
+uninstallation:
+  type: "msi"
+  detect:
+    registry_path: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A4F9E820-21BD-4560-A144-8F7477D645AA}"
+
+updates:
+  strategy: "version"
+  channel: "stable"

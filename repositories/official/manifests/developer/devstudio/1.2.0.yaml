@@ -1,0 +1,55 @@
+schema_version: "1.0"
+
+package:
+  id: "developer.devstudio"
+  name: "DevStudio"
+  version: "1.2.0"
+  description: "Modern lightweight workspace editor and developer toolkit with syntax highlighting and Git workflow."
+  publisher: "T3 Community"
+  license: "MIT"
+  homepage: "https://devstudio.tools"
+  repository: "https://github.com/developer/devstudio"
+  categories:
+    - Developer Tools
+    - Utilities
+  tags:
+    - editor
+    - ide
+    - developer-tools
+    - code
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-10-31"
+
+artifacts:
+  - id: "windows-x64-installer"
+    type: "exe"
+    url: "https://github.com/developer/devstudio/releases/download/v1.2.0/DevStudio-Setup-1.2.0.exe"
+    sha256: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    size: 28450120
+
+installation:
+  type: "exe"
+  artifact: "windows-x64-installer"
+  scope: "user"
+  arguments:
+    - "/VERYSILENT"
+    - "/SUPPRESSMSGBOXES"
+    - "/NORESTART"
+  timeout_seconds: 600
+
+uninstallation:
+  type: "registry"
+  detect:
+    registry_path: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DevStudio"
+
+updates:
+  strategy: "version"
+  channel: "stable"
