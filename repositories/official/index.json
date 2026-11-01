@@ -1,7 +1,7 @@
 {
   "repository_id": "t3-official",
   "version": 1,
-  "generated_at": "2026-11-01T02:56:36.568681300+00:00",
+  "generated_at": "2026-11-01T13:08:58.790452600+00:00",
   "packages": [
     {
       "id": "audio.wavestudio",
@@ -26,32 +26,6 @@
           "version": "0.9.5",
           "manifest_path": "manifests/audio/wavestudio/0.9.5.yaml",
           "release_date": "2026-10-20"
-        }
-      ]
-    },
-    {
-      "id": "com.hisabpro.app",
-      "name": "HisabPro",
-      "publisher": "HisabPro",
-      "latest_version": "0.1.1",
-      "description": "HisabPro – Professional Accounting and Business Management Software.",
-      "categories": [
-        "Business",
-        "Productivity"
-      ],
-      "tags": [
-        "accounting",
-        "finance",
-        "business",
-        "hisabpro"
-      ],
-      "icon_url": null,
-      "manifest_path": "manifests/business/hisabpro/0.1.1.yaml",
-      "versions": [
-        {
-          "version": "0.1.1",
-          "manifest_path": "manifests/business/hisabpro/0.1.1.yaml",
-          "release_date": "2026-11-01"
         }
       ]
     },
