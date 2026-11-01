@@ -1,53 +1,25 @@
 {
   "repository_id": "t3-official",
   "version": 1,
-  "generated_at": "2026-10-31T12:00:00Z",
+  "generated_at": "2026-11-01T02:56:36.568681300+00:00",
   "packages": [
-    {
-      "id": "developer.devstudio",
-      "name": "DevStudio",
-      "publisher": "T3 Community",
-      "latest_version": "1.2.0",
-      "description": "Modern lightweight workspace editor and developer toolkit with syntax highlighting and Git workflow.",
-      "categories": ["Developer Tools", "Utilities"],
-      "tags": ["editor", "ide", "developer-tools", "code"],
-      "icon_url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/code.svg",
-      "manifest_path": "manifests/developer/devstudio/1.2.0.yaml",
-      "versions": [
-        {
-          "version": "1.2.0",
-          "manifest_path": "manifests/developer/devstudio/1.2.0.yaml",
-          "release_date": "2026-10-31"
-        }
-      ]
-    },
-    {
-      "id": "tools.terminal-x",
-      "name": "Terminal-X",
-      "publisher": "Terminal Lab",
-      "latest_version": "2.0.1",
-      "description": "GPU-accelerated modern terminal emulator for Windows with native split panes and tabs.",
-      "categories": ["Developer Tools", "Utilities"],
-      "tags": ["terminal", "cli", "developer-tools", "powershell"],
-      "icon_url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.svg",
-      "manifest_path": "manifests/tools/terminal-x/2.0.1.yaml",
-      "versions": [
-        {
-          "version": "2.0.1",
-          "manifest_path": "manifests/tools/terminal-x/2.0.1.yaml",
-          "release_date": "2026-10-25"
-        }
-      ]
-    },
     {
       "id": "audio.wavestudio",
       "name": "WaveStudio",
       "publisher": "Acoustic Audio",
       "latest_version": "0.9.5",
       "description": "Professional multi-track digital audio workstation and audio editing suite.",
-      "categories": ["Audio", "Media"],
-      "tags": ["audio-editor", "daw", "music", "sound"],
-      "icon_url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/waveform.svg",
+      "categories": [
+        "Audio",
+        "Media"
+      ],
+      "tags": [
+        "audio-editor",
+        "daw",
+        "music",
+        "sound"
+      ],
+      "icon_url": null,
       "manifest_path": "manifests/audio/wavestudio/0.9.5.yaml",
       "versions": [
         {
@@ -58,20 +30,106 @@
       ]
     },
     {
+      "id": "com.hisabpro.app",
+      "name": "HisabPro",
+      "publisher": "HisabPro",
+      "latest_version": "0.1.1",
+      "description": "HisabPro – Professional Accounting and Business Management Software.",
+      "categories": [
+        "Business",
+        "Productivity"
+      ],
+      "tags": [
+        "accounting",
+        "finance",
+        "business",
+        "hisabpro"
+      ],
+      "icon_url": null,
+      "manifest_path": "manifests/business/hisabpro/0.1.1.yaml",
+      "versions": [
+        {
+          "version": "0.1.1",
+          "manifest_path": "manifests/business/hisabpro/0.1.1.yaml",
+          "release_date": "2026-11-01"
+        }
+      ]
+    },
+    {
+      "id": "developer.devstudio",
+      "name": "DevStudio",
+      "publisher": "T3 Community",
+      "latest_version": "1.2.0",
+      "description": "Modern lightweight workspace editor and developer toolkit with syntax highlighting and Git workflow.",
+      "categories": [
+        "Developer Tools",
+        "Utilities"
+      ],
+      "tags": [
+        "editor",
+        "ide",
+        "developer-tools",
+        "code"
+      ],
+      "icon_url": null,
+      "manifest_path": "manifests/developer/devstudio/1.2.0.yaml",
+      "versions": [
+        {
+          "version": "1.2.0",
+          "manifest_path": "manifests/developer/devstudio/1.2.0.yaml",
+          "release_date": "2026-10-31"
+        }
+      ]
+    },
+    {
       "id": "security.keyvault",
       "name": "KeyVault Desktop",
       "publisher": "CipherSecurity",
       "latest_version": "3.1.0",
       "description": "Zero-knowledge offline credentials vault with hardware security key (FIDO2) support.",
-      "categories": ["Security", "Utilities"],
-      "tags": ["password-manager", "vault", "security", "fido2"],
-      "icon_url": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield.svg",
+      "categories": [
+        "Security",
+        "Utilities"
+      ],
+      "tags": [
+        "password-manager",
+        "vault",
+        "security",
+        "fido2"
+      ],
+      "icon_url": null,
       "manifest_path": "manifests/security/keyvault/3.1.0.yaml",
       "versions": [
         {
           "version": "3.1.0",
           "manifest_path": "manifests/security/keyvault/3.1.0.yaml",
           "release_date": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "id": "tools.terminal-x",
+      "name": "Terminal-X",
+      "publisher": "Terminal Lab",
+      "latest_version": "2.0.1",
+      "description": "GPU-accelerated modern terminal emulator for Windows with native split panes and tabs.",
+      "categories": [
+        "Developer Tools",
+        "Utilities"
+      ],
+      "tags": [
+        "terminal",
+        "cli",
+        "developer-tools",
+        "powershell"
+      ],
+      "icon_url": null,
+      "manifest_path": "manifests/tools/terminal-x/2.0.1.yaml",
+      "versions": [
+        {
+          "version": "2.0.1",
+          "manifest_path": "manifests/tools/terminal-x/2.0.1.yaml",
+          "release_date": "2026-10-25"
         }
       ]
     }

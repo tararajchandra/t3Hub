@@ -1,0 +1,49 @@
+schema_version: "1.0"
+
+package:
+  id: "com.hisabpro.app"
+  name: "HisabPro"
+  version: "0.1.1"
+  description: "HisabPro – Professional Accounting and Business Management Software."
+  publisher: "HisabPro"
+  license: "Proprietary"
+  homepage: "https://github.com/tararajchandra"
+  categories:
+    - Business
+    - Productivity
+  tags:
+    - accounting
+    - finance
+    - business
+    - hisabpro
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-11-01"
+
+artifacts:
+  - id: "windows-x64-msi"
+    type: "msi"
+    url: "https://github.com/tararajchandra/t3Hub/releases/download/v0.1.1/HisabPro_0.1.1_x64_en-US.msi"
+    sha256: "68379b6cdcb529d51135d57dd9f1354a9e5e148dd771ed2fd5d288131a8c63ee"
+    size: 57032704
+
+installation:
+  type: "msi"
+  artifact: "windows-x64-msi"
+  scope: "user"
+  arguments: []
+  timeout_seconds: 600
+
+uninstallation:
+  type: "msi"
+
+updates:
+  strategy: "version"
+  channel: "stable"
