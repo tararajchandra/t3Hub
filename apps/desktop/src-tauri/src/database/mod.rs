@@ -215,7 +215,7 @@ impl DatabaseManager {
                 params![
                     "t3-official",
                     "T3 Official Repository",
-                    "https://repo.t3hub.dev/official/",
+                    "https://raw.githubusercontent.com/tararajchandra/t3Hub/main/repositories/official/",
                     "official",
                     1,
                     "verified",

@@ -1,7 +1,7 @@
 {
   "id": "t3-official",
   "name": "T3 Official Repository",
-  "url": "https://repo.t3hub.dev/official/",
+  "url": "https://raw.githubusercontent.com/tararajchandra/t3Hub/main/repositories/official/",
   "type": "official",
   "version": 1,
   "description": "Curated, verified open-source and commercial applications for Windows",
