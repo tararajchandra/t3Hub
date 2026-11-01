@@ -129,4 +129,12 @@ cargo test --workspace
 ---
 
 ## 📄 License
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🔒 Code Signing & Acknowledgements
+
+Free code signing is provided by the [SignPath Foundation](https://about.signpath.io/open-source/).
+
+Binary artifacts released on the [GitHub Releases](https://github.com/tararajchandra/t3Hub/releases) page are cryptographically signed using code signing certificates provided by the SignPath Foundation to ensure secure, tamper-proof distribution on Windows.
