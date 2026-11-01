@@ -36,11 +36,13 @@ mod tests {
         assert!(index.packages.len() >= 4, "Should have at least 4 test packages");
 
         // 3. Test manifest fetch and validation
-        let first_pkg = &index.packages[0];
-        let manifest = client.fetch_manifest(base_url, &first_pkg.manifest_path).await
+        let devstudio_pkg = index.packages.iter()
+            .find(|p| p.id == "developer.devstudio")
+            .expect("developer.devstudio should exist in index");
+        let manifest = client.fetch_manifest(base_url, &devstudio_pkg.manifest_path).await
             .expect("Failed to fetch and parse manifest");
 
-        assert_eq!(manifest.package.id, first_pkg.id);
+        assert_eq!(manifest.package.id, devstudio_pkg.id);
         assert_eq!(manifest.schema_version, "1.0");
         assert_eq!(manifest.platform.os, "windows");
         assert_eq!(manifest.installation.artifact, "windows-x64-installer");
