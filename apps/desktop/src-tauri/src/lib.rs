@@ -65,6 +65,7 @@ pub fn run() {
             commands::uninstall_package,
             commands::get_detected_installed_apps,
             commands::check_updates,
+            commands::clear_download_cache,
             commands::toggle_repository,
             commands::remove_repository,
             commands::update_repository_trust,

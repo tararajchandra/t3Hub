@@ -4,8 +4,8 @@ import {
   Database,
   Moon,
   Sun,
+  Monitor,
   ShieldCheck,
-  Folder,
   Trash2,
   CheckCircle2,
   Activity,
@@ -18,6 +18,7 @@ import {
   useDatabaseStatus,
   useOperationsLog,
   useSystemInfo,
+  useClearDownloadCache,
 } from '../../hooks/useBackend';
 import type { ThemeMode } from '../../types';
 
@@ -28,18 +29,18 @@ export const SettingsPage: React.FC = () => {
   const { data: dbStats, refetch: refetchDbStats } = useDatabaseStatus();
   const { data: operations } = useOperationsLog();
   const { data: sysInfo } = useSystemInfo();
+  const clearCacheMutation = useClearDownloadCache();
 
-  const [downloadDir, setDownloadDir] = useState<string>(
-    dbSettings?.download_directory || 'C:\\Users\\Default\\AppData\\Local\\T3Hub\\Cache'
-  );
-  const [cacheLimit, setCacheLimit] = useState<string>(
-    dbSettings?.cache_limit_gb || '10'
-  );
+  const [downloadDirOverride, setDownloadDirOverride] = useState<string | null>(null);
+  const [cacheLimitOverride, setCacheLimitOverride] = useState<string | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+
+  const downloadDir = downloadDirOverride ?? (dbSettings?.download_directory ?? '');
+  const cacheLimit = cacheLimitOverride ?? (dbSettings?.cache_limit_gb ?? '10');
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    updateSetting({ key: 'download_directory', value: downloadDir });
+    updateSetting({ key: 'download_directory', value: downloadDir.trim() });
     updateSetting({ key: 'cache_limit_gb', value: cacheLimit });
     setSaveNotice('Settings successfully saved to local SQLite database.');
     setTimeout(() => setSaveNotice(null), 4000);
@@ -48,6 +49,19 @@ export const SettingsPage: React.FC = () => {
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     updateSetting({ key: 'theme', value: newTheme });
+  };
+
+  const handleClearCache = () => {
+    clearCacheMutation.mutate(undefined, {
+      onSuccess: (removedCount) => {
+        setSaveNotice(`Local download cache cleared (${removedCount} cached artifact file(s) removed).`);
+        setTimeout(() => setSaveNotice(null), 4000);
+      },
+      onError: (err) => {
+        setSaveNotice(`Failed to clear download cache: ${String(err)}`);
+        setTimeout(() => setSaveNotice(null), 4000);
+      },
+    });
   };
 
   return (
@@ -92,6 +106,13 @@ export const SettingsPage: React.FC = () => {
               >
                 <Sun size={16} /> Light Theme
               </button>
+              <button
+                type="button"
+                onClick={() => handleThemeChange('system')}
+                className={`theme-btn ${theme === 'system' ? 'theme-btn-active' : ''}`}
+              >
+                <Monitor size={16} /> System Default
+              </button>
             </div>
           </div>
         </div>
@@ -104,24 +125,18 @@ export const SettingsPage: React.FC = () => {
           </div>
           <div className="settings-body">
             <div className="form-group">
-              <label className="form-label">Package Download & Staging Directory</label>
+              <label className="form-label">Custom Package Download & Staging Directory</label>
               <div className="input-with-button">
                 <input
                   type="text"
+                  placeholder="Default: %LOCALAPPDATA%\T3Hub\Cache"
                   value={downloadDir}
-                  onChange={(e) => setDownloadDir(e.target.value)}
+                  onChange={(e) => setDownloadDirOverride(e.target.value)}
                   className="form-input font-mono text-xs"
                 />
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => alert('Folder selection dialog will connect to native Windows dialog in Milestone 3.')}
-                >
-                  <Folder size={15} /> Browse
-                </button>
               </div>
               <span className="form-hint">
-                Downloaded `.exe`, `.msi`, and `.zip` artifacts are cached here before integrity hashing.
+                Leave blank to use default per-user cache (`%LOCALAPPDATA%\T3Hub\Cache`). Downloaded `.exe`, `.msi`, and `.zip` artifacts are cached here before integrity hashing.
               </span>
             </div>
 
@@ -132,7 +147,7 @@ export const SettingsPage: React.FC = () => {
                 min="1"
                 max="100"
                 value={cacheLimit}
-                onChange={(e) => setCacheLimit(e.target.value)}
+                onChange={(e) => setCacheLimitOverride(e.target.value)}
                 className="form-input"
                 style={{ maxWidth: 200 }}
               />
@@ -141,13 +156,11 @@ export const SettingsPage: React.FC = () => {
             <div className="form-group" style={{ marginTop: 12 }}>
               <button
                 type="button"
-                onClick={() => {
-                  setSaveNotice('Local download cache cleared.');
-                  setTimeout(() => setSaveNotice(null), 3000);
-                }}
+                disabled={clearCacheMutation.isPending}
+                onClick={handleClearCache}
                 className="btn btn-secondary btn-sm text-danger"
               >
-                <Trash2 size={14} /> Clear Cached Download Files
+                <Trash2 size={14} /> {clearCacheMutation.isPending ? 'Clearing Cache...' : 'Clear Cached Download Files'}
               </button>
             </div>
           </div>

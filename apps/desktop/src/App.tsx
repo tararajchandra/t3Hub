@@ -25,12 +25,22 @@ const AppContent: React.FC = () => {
   // Synchronize color theme with root document element
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('theme-dark', 'theme-light');
+    const applyTheme = () => {
+      root.classList.remove('theme-dark', 'theme-light');
+      if (theme === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.classList.add(prefersDark ? 'theme-dark' : 'theme-light');
+      } else {
+        root.classList.add(`theme-${theme}`);
+      }
+    };
+
+    applyTheme();
+
     if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(prefersDark ? 'theme-dark' : 'theme-light');
-    } else {
-      root.classList.add(`theme-${theme}`);
+      const mql = window.matchMedia('(prefers-color-scheme: dark)');
+      mql.addEventListener('change', applyTheme);
+      return () => mql.removeEventListener('change', applyTheme);
     }
   }, [theme]);
 

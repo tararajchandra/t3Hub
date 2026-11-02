@@ -170,6 +170,9 @@ pub fn validate_manifest(manifest: &WspManifest) -> Result<(), Vec<String>> {
             || arg.contains('>')
             || arg.contains('<')
             || arg.contains('`')
+            || arg.contains('$')
+            || arg.contains('\n')
+            || arg.contains('\r')
         {
             errors.push(format!(
                 "installation.arguments contains prohibited shell control characters in argument '{}'. Arguments are passed directly without shell expansion.",

@@ -65,6 +65,23 @@ impl DownloadManager {
         self.cache_dir.join(filename)
     }
 
+    /// Removes all cached files in `cache_dir` and returns the count of removed files.
+    pub fn clear_cache(&self) -> io::Result<usize> {
+        if !self.cache_dir.exists() {
+            return Ok(0);
+        }
+        let mut removed = 0;
+        for entry in fs::read_dir(&self.cache_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() {
+                fs::remove_file(path)?;
+                removed += 1;
+            }
+        }
+        Ok(removed)
+    }
+
     /// Checks if a valid cached artifact already exists and matches expected SHA-256.
     pub fn get_verified_cache(&self, sha256: &str, extension: &str) -> Option<PathBuf> {
         let path = self.get_cached_artifact_path(sha256, extension);

@@ -32,16 +32,42 @@ impl<'a> InstallationEngine<'a> {
         }
     }
 
-    /// Default constructor utilizing standard Windows per-user directories (%LOCALAPPDATA%\T3Hub)
+    /// Default constructor utilizing configured `download_directory` or standard Windows per-user directories (%LOCALAPPDATA%\T3Hub)
     pub fn default_paths(db: &'a DatabaseManager) -> Self {
         let base_dir = dirs::data_local_dir()
             .unwrap_or_else(|| PathBuf::from("."))
             .join("T3Hub");
 
-        let cache_dir = base_dir.join("Cache");
+        let custom_cache = db
+            .get_setting("download_directory")
+            .ok()
+            .flatten()
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty());
+
+        let cache_dir = match custom_cache {
+            Some(dir) => PathBuf::from(dir),
+            None => base_dir.join("Cache"),
+        };
         let apps_dir = base_dir.join("Apps");
 
         Self::new(db, cache_dir, apps_dir)
+    }
+
+    /// Clears all cached installer artifacts from the active cache directory.
+    pub fn clear_cache(&self) -> Result<usize, String> {
+        self.download_manager
+            .clear_cache()
+            .map_err(|e| format!("Failed to clear download cache: {e}"))
+    }
+
+    fn current_platform_arch() -> &'static str {
+        match std::env::consts::ARCH {
+            "x86_64" => "x64",
+            "aarch64" => "arm64",
+            "x86" => "x86",
+            other => other,
+        }
     }
 
     /// Orchestrates end-to-end installation of a package:
@@ -133,6 +159,23 @@ impl<'a> InstallationEngine<'a> {
             &ver_str,
             &logs.join("\n"),
         );
+
+        // Verify host architecture compatibility
+        let host_arch = Self::current_platform_arch();
+        if !manifest.platform.architectures.iter().any(|a| a.eq_ignore_ascii_case(host_arch)) {
+            let err = format!(
+                "Package '{}' (v{}) requires architecture {:?}, which is incompatible with current host architecture '{}'.",
+                package_id, ver_str, manifest.platform.architectures, host_arch
+            );
+            logs.push(err.clone());
+            let _ = self.db.record_operation_complete(&op_id, "failed", &logs.join("\n"));
+            return InstallationResult {
+                success: false,
+                install_path: None,
+                logs: logs.join("\n"),
+                error_message: Some(err),
+            };
+        }
 
         // 2. Resolve target artifact
         let artifact = match manifest

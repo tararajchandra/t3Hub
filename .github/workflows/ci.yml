@@ -31,7 +31,12 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd apps/desktop
-          npm install
+          npm ci
+
+      - name: Lint Frontend
+        run: |
+          cd apps/desktop
+          npm run lint
 
       - name: Build Frontend
         run: |

@@ -105,6 +105,10 @@ export const tauriService = {
     return await invoke<AvailableUpdate[]>('check_updates');
   },
 
+  async clearDownloadCache(): Promise<number> {
+    return await invoke<number>('clear_download_cache');
+  },
+
   async toggleRepository(id: string, enabled: boolean): Promise<void> {
     return await invoke<void>('toggle_repository', { id, enabled });
   },

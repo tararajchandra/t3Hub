@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::process::Command;
 use chrono::Utc;
-use log::{info, warn, error};
+use log::{info, error};
 
 use crate::database::DatabaseManager;
 use crate::installer::adapters::MsiInstaller;
@@ -26,35 +26,42 @@ impl UninstallEngine {
         Self::new(db, apps_dir)
     }
 
-    /// Safely split a Windows command line string into (executable_path, args)
+    /// Safely split a Windows command line string into (executable_path, args),
+    /// respecting double-quoted segments in both the executable path and arguments.
     pub fn parse_command_line(cmd_line: &str) -> Option<(String, Vec<String>)> {
         let trimmed = cmd_line.trim();
         if trimmed.is_empty() {
             return None;
         }
 
-        if trimmed.starts_with('"') {
-            // Quoted executable: find closing quote
-            if let Some(end_quote) = trimmed[1..].find('"') {
-                let exe = &trimmed[1..=end_quote];
-                let rest = trimmed[end_quote + 2..].trim();
-                let args = if rest.is_empty() {
-                    Vec::new()
-                } else {
-                    rest.split_whitespace().map(|s| s.to_string()).collect()
-                };
-                return Some((exe.to_string(), args));
+        let mut tokens = Vec::new();
+        let mut current = String::new();
+        let mut in_quotes = false;
+
+        for ch in trimmed.chars() {
+            match ch {
+                '"' => {
+                    in_quotes = !in_quotes;
+                }
+                c if c.is_whitespace() && !in_quotes => {
+                    if !current.is_empty() {
+                        tokens.push(std::mem::take(&mut current));
+                    }
+                }
+                c => {
+                    current.push(c);
+                }
             }
         }
+        if !current.is_empty() {
+            tokens.push(current);
+        }
 
-        // Space-separated
-        let parts: Vec<&str> = trimmed.split_whitespace().collect();
-        if parts.is_empty() {
+        if tokens.is_empty() {
             None
         } else {
-            let exe = parts[0].to_string();
-            let args = parts[1..].iter().map(|s| s.to_string()).collect();
-            Some((exe, args))
+            let exe = tokens.remove(0);
+            Some((exe, tokens))
         }
     }
 
@@ -136,15 +143,41 @@ impl UninstallEngine {
 
             "msi" => {
                 log_lines.push(format!("Executing MSI uninstallation for {}", package_id));
-                // If install_path is a product code GUID (e.g. {12345678-....})
-                let target = install_path.as_deref().unwrap_or(package_id);
+                // Check manifest for MSI ProductCode GUID in detect.registry_path first
+                let mut msi_target: Option<String> = None;
+                if let Ok(Some(details)) = self.db.get_package_details(package_id) {
+                    if let Some(ver) = details.versions.first() {
+                        if let Ok(manifest) = parse_manifest_from_str(&ver.manifest_raw) {
+                            if let Some(ref uninst) = manifest.uninstallation {
+                                if let Some(ref detect) = uninst.detect {
+                                    if let Some(ref reg_path) = detect.registry_path {
+                                        if let Some(last_segment) = reg_path.rsplit('\\').next() {
+                                            if last_segment.starts_with('{') && last_segment.ends_with('}') {
+                                                msi_target = Some(last_segment.to_string());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                let target = msi_target
+                    .as_deref()
+                    .or(install_path.as_deref())
+                    .unwrap_or(package_id);
+
                 match MsiInstaller::uninstall(target, None) {
                     Ok(outcome) => {
                         log_lines.push(format!("MSI uninstaller finished: {}", outcome.message));
                     }
                     Err(e) => {
-                        warn!("MSI uninstallation reported error: {}. Cleaning inventory.", e);
-                        log_lines.push(format!("Warning: MSI uninstaller output: {}", e));
+                        let err = format!("MSI uninstallation failed for '{}': {}", package_id, e);
+                        error!("{}", err);
+                        log_lines.push(err.clone());
+                        let _ = self.db.record_operation_complete(&op_id, "failed", &log_lines.join("\n"));
+                        return Err(err);
                     }
                 }
             }
@@ -152,11 +185,13 @@ impl UninstallEngine {
             "registry" | "exe" => {
                 log_lines.push(format!("Executing registry/executable uninstaller for {}", package_id));
 
-                // 1. Look up manifest to find declared uninstaller registry path
+                // 1. Look up manifest to find declared uninstaller registry path and profile
                 let mut uninstaller_cmd: Option<String> = None;
+                let mut installer_profile: Option<String> = None;
                 if let Ok(Some(details)) = self.db.get_package_details(package_id) {
                     if let Some(ver) = details.versions.first() {
                         if let Ok(manifest) = parse_manifest_from_str(&ver.manifest_raw) {
+                            installer_profile = manifest.installation.installer_profile.clone();
                             if let Some(ref uninst) = manifest.uninstallation {
                                 if let Some(ref detect) = uninst.detect {
                                     if let Some(ref reg_path) = detect.registry_path {
@@ -181,10 +216,26 @@ impl UninstallEngine {
                 if let Some(cmd_str) = uninstaller_cmd {
                     log_lines.push(format!("Found uninstall command: {}", cmd_str));
                     if let Some((exe, mut args)) = Self::parse_command_line(&cmd_str) {
-                        // Append silent arguments if standard uninstaller
-                        if !args.iter().any(|a| a.eq_ignore_ascii_case("/silent") || a.eq_ignore_ascii_case("/verysilent") || a.eq_ignore_ascii_case("/s")) {
-                            args.push("/VERYSILENT".to_string());
-                            args.push("/NORESTART".to_string());
+                        // Append silent arguments if not already present
+                        let has_silent = args.iter().any(|a| {
+                            a.eq_ignore_ascii_case("/silent")
+                                || a.eq_ignore_ascii_case("/verysilent")
+                                || a.eq_ignore_ascii_case("/s")
+                                || a.eq_ignore_ascii_case("/quiet")
+                                || a.eq_ignore_ascii_case("/qn")
+                        });
+                        if !has_silent {
+                            match installer_profile.as_deref().map(|s| s.to_lowercase()).as_deref() {
+                                Some("nsis") => args.push("/S".to_string()),
+                                Some("wix") | Some("burn") => {
+                                    args.push("/quiet".to_string());
+                                    args.push("/norestart".to_string());
+                                }
+                                _ => {
+                                    args.push("/VERYSILENT".to_string());
+                                    args.push("/NORESTART".to_string());
+                                }
+                            }
                         }
 
                         let mut cmd = Command::new(&exe);
@@ -194,11 +245,22 @@ impl UninstallEngine {
 
                         match cmd.output() {
                             Ok(output) => {
-                                log_lines.push(format!("Uninstaller exited with code: {:?}", output.status.code()));
+                                let code = output.status.code().unwrap_or(-1);
+                                log_lines.push(format!("Uninstaller exited with code: {}", code));
+                                if code != 0 && code != 3010 {
+                                    let err = format!("Uninstaller exited with non-zero code {}", code);
+                                    error!("{}", err);
+                                    log_lines.push(err.clone());
+                                    let _ = self.db.record_operation_complete(&op_id, "failed", &log_lines.join("\n"));
+                                    return Err(err);
+                                }
                             }
                             Err(e) => {
-                                warn!("Could not execute uninstaller: {}. Proceeding with DB cleanup.", e);
-                                log_lines.push(format!("Warning: Could not launch uninstaller: {}", e));
+                                let err = format!("Failed to launch uninstaller '{}': {}", exe, e);
+                                error!("{}", err);
+                                log_lines.push(err.clone());
+                                let _ = self.db.record_operation_complete(&op_id, "failed", &log_lines.join("\n"));
+                                return Err(err);
                             }
                         }
                     }
@@ -232,10 +294,10 @@ mod tests {
 
     #[test]
     fn test_parse_command_line_quoted_exe() {
-        let cmd = r#""C:\Program Files\MyApp\unins000.exe" /SILENT /NORESTART"#;
+        let cmd = r#""C:\Program Files\MyApp\unins000.exe" /SILENT /NORESTART /D="C:\Program Files\MyApp""#;
         let (exe, args) = UninstallEngine::parse_command_line(cmd).unwrap();
         assert_eq!(exe, r#"C:\Program Files\MyApp\unins000.exe"#);
-        assert_eq!(args, vec!["/SILENT", "/NORESTART"]);
+        assert_eq!(args, vec!["/SILENT", "/NORESTART", r#"/D=C:\Program Files\MyApp"#]);
     }
 
     #[test]

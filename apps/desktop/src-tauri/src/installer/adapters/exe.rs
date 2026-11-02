@@ -64,7 +64,7 @@ pub struct ExeInstaller;
 impl ExeInstaller {
     /// Validates arguments against prohibited shell meta-characters
     pub fn validate_arguments(args: &[String]) -> Result<(), ExeInstallError> {
-        let prohibited = [";", "&", "|", "<", ">", "`", "$", "%", "\n", "\r"];
+        let prohibited = [";", "&", "|", "<", ">", "`", "$", "\n", "\r"];
         for arg in args {
             for bad in &prohibited {
                 if arg.contains(bad) {

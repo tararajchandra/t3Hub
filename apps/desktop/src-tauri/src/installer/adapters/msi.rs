@@ -92,14 +92,31 @@ impl MsiInstaller {
             }
         }
 
-        let _timeout = Duration::from_secs(timeout_seconds.unwrap_or(600));
+        let timeout_secs = timeout_seconds.unwrap_or(600);
+        let timeout = Duration::from_secs(timeout_secs);
 
-        let output = match cmd.output() {
-            Ok(o) => o,
+        let mut child = match cmd.spawn() {
+            Ok(c) => c,
             Err(e) => return Err(MsiInstallError::ProcessSpawn(e.to_string())),
         };
 
-        let exit_code = output.status.code().unwrap_or(-1);
+        let start = std::time::Instant::now();
+        let status = loop {
+            match child.try_wait() {
+                Ok(Some(status)) => break status,
+                Ok(None) => {
+                    if start.elapsed() >= timeout {
+                        let _ = child.kill();
+                        let _ = child.wait();
+                        return Err(MsiInstallError::Timeout(timeout_secs));
+                    }
+                    std::thread::sleep(Duration::from_millis(100));
+                }
+                Err(e) => return Err(MsiInstallError::ProcessSpawn(e.to_string())),
+            }
+        };
+
+        let exit_code = status.code().unwrap_or(-1);
 
         match exit_code {
             0 => Ok(MsiInstallOutcome {

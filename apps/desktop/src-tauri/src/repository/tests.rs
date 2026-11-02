@@ -83,6 +83,8 @@ mod tests {
         assert_eq!(devstudio_results.len(), 1);
         assert_eq!(devstudio_results[0].name, "DevStudio");
         assert_eq!(devstudio_results[0].publisher, "T3 Community");
+        assert_eq!(devstudio_results[0].license.as_deref(), Some("MIT"));
+        assert_eq!(devstudio_results[0].homepage.as_deref(), Some("https://devstudio.tools"));
 
         // Category filter search
         let dev_results = db.search_packages(None, Some("Developer Tools"), None)

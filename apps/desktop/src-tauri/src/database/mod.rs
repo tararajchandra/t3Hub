@@ -268,6 +268,18 @@ impl DatabaseManager {
         Ok(map)
     }
 
+    pub fn get_setting(&self, key: &str) -> Result<Option<String>, DatabaseError> {
+        let conn = self.conn.lock();
+        let val = conn
+            .query_row(
+                "SELECT value FROM settings WHERE key = ?1;",
+                params![key],
+                |row| row.get(0),
+            )
+            .optional()?;
+        Ok(val)
+    }
+
     pub fn set_setting(&self, key: &str, value: &str) -> Result<(), DatabaseError> {
         let conn = self.conn.lock();
         let now = Utc::now().to_rfc3339();
@@ -400,6 +412,21 @@ impl DatabaseManager {
                 timestamp,
                 timestamp
             ],
+        )?;
+        Ok(())
+    }
+
+    pub fn update_package_extended_metadata(
+        &self,
+        id: &str,
+        license: Option<&str>,
+        homepage: Option<&str>,
+        repository_url: Option<&str>,
+    ) -> Result<(), DatabaseError> {
+        let conn = self.conn.lock();
+        conn.execute(
+            "UPDATE packages SET license = COALESCE(?1, license), homepage = COALESCE(?2, homepage), repository_url = COALESCE(?3, repository_url) WHERE id = ?4;",
+            params![license, homepage, repository_url, id],
         )?;
         Ok(())
     }
@@ -598,6 +625,15 @@ impl DatabaseManager {
         for v in version_rows {
             versions.push(v?);
         }
+
+        // Sort versions by SemVer descending so versions[0] is always the highest release
+        versions.sort_by(|a, b| {
+            let va = semver::Version::parse(a.version.trim_start_matches('v'))
+                .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
+            let vb = semver::Version::parse(b.version.trim_start_matches('v'))
+                .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
+            vb.cmp(&va)
+        });
 
         Ok(Some(CatalogPackageDetails {
             summary,

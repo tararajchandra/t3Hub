@@ -192,7 +192,7 @@ pub async fn install_package(
 }
 
 #[tauri::command]
-pub fn uninstall_package(
+pub async fn uninstall_package(
     state: State<'_, AppState>,
     package_id: String,
 ) -> Result<crate::uninstall::UninstallResult, String> {
@@ -201,14 +201,20 @@ pub fn uninstall_package(
 }
 
 #[tauri::command]
-pub fn get_detected_installed_apps() -> Result<Vec<crate::installer::InstalledAppInfo>, String> {
+pub async fn get_detected_installed_apps() -> Result<Vec<crate::installer::InstalledAppInfo>, String> {
     Ok(crate::installer::AppDetector::detect_all_installed_apps())
 }
 
 #[tauri::command]
-pub fn check_updates(state: State<'_, AppState>) -> Result<Vec<crate::updater::AvailableUpdate>, String> {
+pub async fn check_updates(state: State<'_, AppState>) -> Result<Vec<crate::updater::AvailableUpdate>, String> {
     let engine = crate::updater::UpdateEngine::new(state.db.clone());
     engine.check_for_updates()
+}
+
+#[tauri::command]
+pub async fn clear_download_cache(state: State<'_, AppState>) -> Result<usize, String> {
+    let engine = InstallationEngine::default_paths(&state.db);
+    engine.clear_cache()
 }
 
 #[tauri::command]

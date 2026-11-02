@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { NavigationTab, ThemeMode, PackageCardItem } from '../types';
+import type { NavigationTab, ThemeMode } from '../types';
 
 interface AppStore {
   activeTab: NavigationTab;
@@ -10,8 +10,6 @@ interface AppStore {
   setSearchQuery: (query: string) => void;
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;
-  selectedPackage: PackageCardItem | null;
-  setSelectedPackage: (pkg: PackageCardItem | null) => void;
   selectedPackageId: string | null;
   setSelectedPackageId: (id: string | null) => void;
 }
@@ -28,8 +26,6 @@ export const useAppStore = create<AppStore>((set) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
   selectedCategory: 'All',
   setSelectedCategory: (cat) => set({ selectedCategory: cat }),
-  selectedPackage: null,
-  setSelectedPackage: (pkg) => set({ selectedPackage: pkg }),
   selectedPackageId: null,
   setSelectedPackageId: (id) => set({ selectedPackageId: id }),
 }));

@@ -164,7 +164,16 @@ pub fn validate_manifest(manifest: &WspManifest) -> Result<(), Vec<String>> {
 
     // Security check: arguments must not contain shell pipe/redirection characters
     for arg in &inst.arguments {
-        if arg.contains('|') || arg.contains('&') || arg.contains(';') || arg.contains('>') || arg.contains('<') || arg.contains('`') {
+        if arg.contains('|')
+            || arg.contains('&')
+            || arg.contains(';')
+            || arg.contains('>')
+            || arg.contains('<')
+            || arg.contains('`')
+            || arg.contains('$')
+            || arg.contains('\n')
+            || arg.contains('\r')
+        {
             errors.push(format!(
                 "installation.arguments contains prohibited shell control characters in argument '{}'. Arguments are passed directly to execve without shell expansion.",
                 arg

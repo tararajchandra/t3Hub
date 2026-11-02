@@ -60,7 +60,9 @@ export function useUninstallPackage() {
     mutationFn: (packageId: string) => tauriService.uninstallPackage(packageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['installedApps'] });
-      queryClient.invalidateQueries({ queryKey: ['catalogPackages'] });
+      queryClient.invalidateQueries({ queryKey: ['catalogSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['packageDetails'] });
+      queryClient.invalidateQueries({ queryKey: ['availableUpdates'] });
       queryClient.invalidateQueries({ queryKey: ['databaseStatus'] });
       queryClient.invalidateQueries({ queryKey: ['operationsLog'] });
     },
@@ -82,7 +84,7 @@ export function useToggleRepository() {
       tauriService.toggleRepository(id, enabled),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repositories'] });
-      queryClient.invalidateQueries({ queryKey: ['catalogPackages'] });
+      queryClient.invalidateQueries({ queryKey: ['catalogSearch'] });
       queryClient.invalidateQueries({ queryKey: ['availableUpdates'] });
     },
   });
@@ -94,7 +96,7 @@ export function useRemoveRepository() {
     mutationFn: (id: string) => tauriService.removeRepository(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repositories'] });
-      queryClient.invalidateQueries({ queryKey: ['catalogPackages'] });
+      queryClient.invalidateQueries({ queryKey: ['catalogSearch'] });
       queryClient.invalidateQueries({ queryKey: ['databaseStatus'] });
       queryClient.invalidateQueries({ queryKey: ['availableUpdates'] });
     },
@@ -145,6 +147,8 @@ export function useSyncRepositories() {
     mutationFn: () => tauriService.syncRepositories(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catalogSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['packageDetails'] });
+      queryClient.invalidateQueries({ queryKey: ['availableUpdates'] });
       queryClient.invalidateQueries({ queryKey: ['repositories'] });
       queryClient.invalidateQueries({ queryKey: ['databaseStatus'] });
     },
@@ -171,8 +175,16 @@ export function useInstallPackage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['installedApps'] });
       queryClient.invalidateQueries({ queryKey: ['catalogSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['packageDetails'] });
+      queryClient.invalidateQueries({ queryKey: ['availableUpdates'] });
       queryClient.invalidateQueries({ queryKey: ['operationsLog'] });
       queryClient.invalidateQueries({ queryKey: ['databaseStatus'] });
     },
+  });
+}
+
+export function useClearDownloadCache() {
+  return useMutation({
+    mutationFn: () => tauriService.clearDownloadCache(),
   });
 }
