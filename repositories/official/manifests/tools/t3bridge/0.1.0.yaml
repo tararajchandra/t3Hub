@@ -1,0 +1,57 @@
+schema_version: "1.0"
+
+package:
+  id: "tools.t3bridge"
+  name: "t3Bridge"
+  version: "0.1.0"
+  description: "Universal P2P Business Application Bridge & Mesh Network for Desktop Business & Accounting Software (Marg ERP, Tally Prime, Busy ERP, SMB)."
+  publisher: "t3Bridge Team"
+  license: "Proprietary"
+  homepage: "https://github.com/wintararaj-cmd/t3bridge-release"
+  repository: "https://github.com/wintararaj-cmd/t3bridge-release"
+  categories:
+    - Networking
+    - Business
+    - Utilities
+  tags:
+    - p2p
+    - vpn
+    - smb
+    - erp
+    - tally
+    - marg
+    - networking
+
+platform:
+  os: "windows"
+  architectures:
+    - "x64"
+  minimum_windows_version: "10"
+
+release:
+  channel: "stable"
+  release_date: "2026-11-23"
+
+artifacts:
+  - id: "windows-x64-installer"
+    type: "exe"
+    url: "https://github.com/wintararaj-cmd/t3bridge-release/releases/download/v0.1.0/t3Bridge_0.1.0_x64-setup.exe"
+    sha256: "e97849bda7a98eaf9efc4e84150c3666006f32179c6f2f9e9f2894834bfc74b9"
+    size: 3750218
+
+installation:
+  type: "exe"
+  artifact: "windows-x64-installer"
+  scope: "user"
+  arguments:
+    - "/S"
+  timeout_seconds: 600
+
+uninstallation:
+  type: "registry"
+  detect:
+    registry_path: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\t3Bridge"
+
+updates:
+  strategy: "version"
+  channel: "stable"
