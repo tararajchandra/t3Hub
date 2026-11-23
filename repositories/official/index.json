@@ -1,7 +1,7 @@
 {
   "repository_id": "t3-official",
   "version": 1,
-  "generated_at": "2026-11-01T13:08:58.790452600+00:00",
+  "generated_at": "2026-11-23T04:18:00Z",
   "packages": [
     {
       "id": "audio.wavestudio",
@@ -78,6 +78,36 @@
           "version": "3.1.0",
           "manifest_path": "manifests/security/keyvault/3.1.0.yaml",
           "release_date": "2026-10-15"
+        }
+      ]
+    },
+    {
+      "id": "tools.t3bridge",
+      "name": "t3Bridge",
+      "publisher": "t3Bridge Team",
+      "latest_version": "0.1.0",
+      "description": "Universal P2P Business Application Bridge & Mesh Network for Desktop Business & Accounting Software (Marg ERP, Tally Prime, Busy ERP, SMB).",
+      "categories": [
+        "Networking",
+        "Business",
+        "Utilities"
+      ],
+      "tags": [
+        "p2p",
+        "vpn",
+        "smb",
+        "erp",
+        "tally",
+        "marg",
+        "networking"
+      ],
+      "icon_url": null,
+      "manifest_path": "manifests/tools/t3bridge/0.1.0.yaml",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "manifest_path": "manifests/tools/t3bridge/0.1.0.yaml",
+          "release_date": "2026-11-23"
         }
       ]
     },
